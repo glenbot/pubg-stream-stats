@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>PUBG Stream Stats</title>
+        <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="assets/css/app.css">
+
+        <script>if (typeof module === 'object') { window.module = module; module = undefined; }</script>
+
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/icons.js"></script>
+        <script src="assets/js/riot+compiler.min.js"></script>
+        <script src="assets/js/navigo.min.js"></script>
+        <script src="assets/js/math.min.js"></script>
+        <script src="assets/js/app.js"></script>
+
+        <script>if (window.module) module = window.module;</script>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <navigation></navigation>
+            <script type="riot/tag" src="assets/views/navigation.tag"></script>
+            <div class="row justify-content-center">
+                <img src="assets/images/header.png" class="img-fluid" />
+            </div>
+            <div class="row justify-content-center">
+                <h5>Get PUBG API data to text files for use in streaming software</h5>
+            </div>
+            <div class="row">&nbsp;</div>
+            <div id="index" data-route="index">
+                <run></run>
+                <script type="riot/tag" src="assets/views/run.tag"></script>
+            </div>
+            <div id="settings" data-route="settings">
+                <settings></settings>
+                <script type="riot/tag" src="assets/views/settings.tag"></script>
+            </div>
+        </div>
+    </body>
+  </html>
