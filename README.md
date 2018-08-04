@@ -5,6 +5,8 @@ Get PUBG API data to text files for use in streaming software
 # TODO
 
 [ ] Incorporate into travis and make releases
+[ ] Add ability to set your own labels inside stats files
+[ ] Calculate more than just the last 5 game stats
 
 # Development
 
