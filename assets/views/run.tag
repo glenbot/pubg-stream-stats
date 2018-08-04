@@ -217,6 +217,8 @@
 
         async runStream(e) {
             e.preventDefault();
+            // grab the settings everytime
+            this.app_settings = app_settings.get('app_settings');
 
             // let the user know they have now setup the application yet
             if (this.app_settings === undefined) {
