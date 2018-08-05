@@ -185,7 +185,18 @@
 
             // Player should never be cached because we want fresh set of matches every time
             // Also if the player name is updated in settings we should update the files
-            var players = await this.battlegrounds.getPlayers({ names: [this.app_settings.player_name] });
+            try {
+                var players = await this.battlegrounds.getPlayers({ names: [this.app_settings.player_name] });
+            } catch(err) {
+                this.writeLog(err);
+                this.streamRunning = false;
+                this.update({
+                    streamRunning: false
+                });
+                clearInterval(this.streamInterval);
+                this.writeLog('Stats streaming stopped.');
+                return
+            }
             const player = players[0];
 
             // stats we care to write to files.
@@ -232,8 +243,8 @@
                 this.battlegrounds = new battlegrounds(this.app_settings.api_key, this.app_settings.region);
             }
 
-            this.streamRunning = true;
             this.writeLog('Stats streaming started.');
+            this.streamRunning = true;
             this.processStats();
             this.streamInterval = setInterval(this.processStats, 60000);
         }
