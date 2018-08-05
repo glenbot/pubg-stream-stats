@@ -79,6 +79,15 @@
             });
         }
 
+        this.abort = function() {
+            this.streamRunning = false;
+            this.update({
+                streamRunning: false
+            });
+            clearInterval(this.streamInterval);
+            this.writeLog('Stats streaming stopped.');
+        }
+
         /* 
         * Parse the stats out and return them ready to save to files 
         * player (object) Player object from the stats API
@@ -189,12 +198,7 @@
                 var players = await this.battlegrounds.getPlayers({ names: [this.app_settings.player_name] });
             } catch(err) {
                 this.writeLog(err);
-                this.streamRunning = false;
-                this.update({
-                    streamRunning: false
-                });
-                clearInterval(this.streamInterval);
-                this.writeLog('Stats streaming stopped.');
+                this.abort();
                 return
             }
             const player = players[0];
