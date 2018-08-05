@@ -103,6 +103,13 @@
         this.parseStats = async function(player, stats, statsAverage, matchCount) {
             var playerName = player.attributes.name;
 
+            // check for players that have matches
+            if (player.matches.length == 0) {
+                this.writeLog(sprintf('Player [%s] does not have any matches', playerName));
+                this.abort();
+                return
+            }
+
             // log the total number of matches found
             this.writeLog(vsprintf('Number of matches found: %s', player.matches.length));
             this.statsCache[playerName] = {
