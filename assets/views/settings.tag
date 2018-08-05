@@ -121,7 +121,7 @@
             values = {
                 api_key: apiKey.value,
                 region: region.value,
-                player_name: playerName.value,
+                player_name: playerName.value.trim(),
                 stats_location: statsLocation.value
             };
             if (this.validateValues(values)) {
