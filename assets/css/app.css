@@ -27,6 +27,10 @@
     box-shadow: inset 0px -5px 5px 0px rgba(61,61,61,1);
 }
 
+#clear-success {
+    display: none;
+}
+
 ::-webkit-scrollbar {
   -webkit-appearance: none;
   width: 10px;

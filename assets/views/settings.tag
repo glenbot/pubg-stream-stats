@@ -66,10 +66,14 @@
             <div class="col-sm text-center">
                 <button class="btn btn-primary"><i class="fas fa-save"></i> Save Settings</button>
             </div>
+            <div class="col-sm text-center">
+                <button class="btn btn-danger" onclick={ clearSettings }><i class="fas fa-trash-alt"></i> Clear Settings</button>
+            </div>
         </div>
         <div class="row">&nbsp;</div>
         <div class="row">
             <div class="col-sm text-center">
+                <div id="clear-success" class="alert alert-success hidden" role="alert">Settings cleared!</div>
                 <div id="save-success" class="alert alert-success hidden" role="alert">Settings saved successfully!</div>
                 <div id="save-failed" class="alert alert-warning hidden" role="alert">
                     <ul>
@@ -115,11 +119,13 @@
 
         this.getValue = function(name, value) {
             var outValue = '';
-            if (this._settings[name] !== undefined) {
+
+            try {
                 outValue = this._settings[name];
-            } else {
+            } catch(err) {
                 outValue = value;
             }
+
             return outValue;
         }
 
@@ -127,11 +133,11 @@
             fail_count = 0;
             this.messages = [];
 
-            if (values.api_key == '') {
+            if (values.apiKey == '') {
                 this.messages.push({message: 'Please enter in an api key'});
                 fail_count += 1;
             }
-            if (values.player_name == '') {
+            if (values.playerName == '') {
                 this.messages.push({message: 'Please enter in a player name'});
                 fail_count += 1;
             }
@@ -139,10 +145,11 @@
                 this.messages.push({message: 'Please select a region'});
                 fail_count += 1;
             }
-            if (values.stats_location == '' || values.stats_location == 'undefined') {
+            if (values.statsLocation == '' || values.stats_location == 'undefined') {
                 this.messages.push({message: 'Please select a valid directory.'});
                 fail_count += 1;
             }
+
             if (fail_count > 0)
                 return false;
             return true;
@@ -171,6 +178,12 @@
             } else {
                 $('#save-failed').show();
             }
+        }
+
+        clearSettings(e) {
+            e.preventDefault();
+            appSettings.deleteAll();
+            $('#clear-success').show().fadeOut(2000);
         }
 
         selectDirectory(e) {
