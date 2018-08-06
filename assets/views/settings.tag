@@ -1,43 +1,64 @@
 <settings>
     <form onsubmit={ saveSettings }>
-        <div class="row">
+        <div class="row" id="settings-form">
             <div class="col-sm-10 offset-sm-1">
-                <div class="input-group mb-3">
-                    <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-lg">PUBG API Key</span>
+                <fieldset>
+                    <legend>General</legend>
+                    <div class="input-group mb-3">
+                        <div class="input-group input-group-lg">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-lg">PUBG API Key</span>
+                            </div>
+                            <input type="password" id="apiKey" class="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm" value="{ settings.apiKey }" />
                         </div>
-                        <input type="password" id="apiKey" class="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm" value="{ settings.api_key }" />
                     </div>
-                </div>
 
-                <div class="input-group mb-3">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-lg">Player Name</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-lg">Player Name</span>
+                            </div>
+                            <input type="text" id="playerName" class="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm" value="{ settings.playerName }" />
+                            <small class="form-text text-muted">
+                            Double check your typing here. Player names may be valid but have no stats. This depends on how recently you have played. All stats disappear after 14 days dormancy.
+                            </small>
                         </div>
-                        <input type="text" id="playerName" class="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm" value="{ settings.player_name }" />
                     </div>
-                </div>
 
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="region">Region</label>
-                    </div>
-                    <select class="custom-select" id="region">
-                        <option>Choose Region...</option>
-                        <option each={regions} value="{value}" selected={ settings.region == value }>{name}</option>
-                    </select>
-                </div>
-
-                <div class="input-group mb-3">
-                    <div class="input-group">
+                    <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-lg">Stats Location</span>
+                            <label class="input-group-text" for="region">Region</label>
                         </div>
-                        <input type="text" onclick="{ selectDirectory }" id="statsLocation" class="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm" value="{ settings.stats_location }" />
+                        <select class="custom-select" id="region">
+                            <option>Choose Region...</option>
+                            <option each={regions} value="{value}" selected={ settings.region == value }>{name}</option>
+                        </select>
                     </div>
-                </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-lg">Stats Location</span>
+                            </div>
+                            <input type="text" onclick="{ selectDirectory }" id="statsLocation" class="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm" value="{ settings.statsLocation }" />
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Stats</legend>
+                    <small class="form-text text-muted">
+                    These are the text that will get written to the individual text files
+                    </small>
+                    <div class="input-group mb-3" each={ statsLabels }>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-lg">{ name }</span>
+                            </div>
+                            <input type="text" id="{ name }" class="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm" value="{ getValue(name, value) }" />
+                        </div>
+                    </div>
+                </fieldset>
             </div>
         </div>
         <div class="row">&nbsp;</div>
@@ -63,13 +84,16 @@
         this.settings = {};
         this.messages = [];
 
-        var _settings = app_settings.get('app_settings');
+        this._settings = appSettings.get('appSettings');
+
+        // default labels
+        this.statsLabels = statsLabels;
 
         // copy over the cached settings to be able to show
         // them on the interface
-        if (_settings !== undefined) {
-            for (var i in _settings) {
-                this.settings[i] = _settings[i];
+        if (this._settings !== undefined) {
+            for (var i in this._settings) {
+                this.settings[i] = this._settings[i];
             }
         }
 
@@ -88,6 +112,16 @@
             { value: "pc-sa", name: "pc-sa - South and Central America"},
             { value: "pc-as", name: "pc-as - Asia"}    
         ];
+
+        this.getValue = function(name, value) {
+            var outValue = '';
+            if (this._settings[name] !== undefined) {
+                outValue = this._settings[name];
+            } else {
+                outValue = value;
+            }
+            return outValue;
+        }
 
         this.validateValues = function(values) {
             fail_count = 0;
@@ -119,13 +153,20 @@
             e.preventDefault();
             $('#save-failed').hide();
             values = {
-                api_key: apiKey.value,
+                apiKey: apiKey.value,
                 region: region.value,
-                player_name: playerName.value.trim(),
-                stats_location: statsLocation.value
+                playerName: playerName.value.trim(),
+                statsLocation: statsLocation.value
             };
+
+            // get stats values and append them to values
+            // since it is a list it's done here
+            for (var i in stats) {
+                values[stats[i]] = window[stats[i]].value.trim();
+            }
+
             if (this.validateValues(values)) {
-                app_settings.set('app_settings', values);
+                appSettings.set('appSettings', values);
                 $('#save-success').show().fadeOut(2000);
             } else {
                 $('#save-failed').show();

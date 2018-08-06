@@ -16,14 +16,14 @@
 
     <script>
         // application settings
-        this.app_settings = app_settings.get('app_settings');
+        this.appSettings = appSettings.get('appSettings');
 
         // check to see if the user has setup settings before and
         // initaliaze API accordingly
-        if (this.app_settings === undefined) {
+        if (this.appSettings === undefined) {
             this.battlegrounds = null;
         } else {
-            this.battlegrounds = new battlegrounds(this.app_settings.api_key, this.app_settings.region)
+            this.battlegrounds = new battlegrounds(this.appSettings.apiKey, this.appSettings.region)
         }
 
         // stream logging holder for set interval
@@ -72,7 +72,7 @@
 
         /* Write a file out to the filesystem */
         this.writeFile = function(_file, contents) {
-            fs.writeFile(this.joinFilePath(this.app_settings.stats_location, _file), contents, (err) => {
+            fs.writeFile(this.joinFilePath(this.appSettings.statsLocation, _file), contents, (err) => {
                 if (err) {
                     this.writeLog('Error. Could not save files. Please check your directory in settings.')
                 };
@@ -95,7 +95,7 @@
         * match_count (integer) A number of matches you want to aggregate data for. Filename
                           will have this number in it
 
-        Example filename: <player_name>_<match_count>_kills.txt
+        Example filename: <playerName>_<match_count>_kills.txt
 
         This function returns a dictionary where the key is the player name and the stats
         are the value
@@ -146,6 +146,7 @@
                 } else if (statsCache.matchIds.indexOf(_match.id) < 0) {
                     this.writeLog(vsprintf('Found match [%s]. Updating.', _match.id));
                     var matchStats = await this.battlegrounds.getMatch({id: _match.id });
+
                     statsCache.matchIds.push(_match.id);
                     statsCache.matchStats[_match.id] = matchStats;
                 }
@@ -162,7 +163,7 @@
                     if (participant.attributes.stats.playerId == player.id) {
                         for (var k in stats) {
                             var stat = participant.attributes.stats[stats[k]];
-                            if (stat !== undefined) {
+                            if (stat !== undefined && stats[k]!== undefined) {
                                 parsedStats[playerName][stats[k]] += math.round(stat, 2);
                             }
                         }
@@ -185,8 +186,12 @@
             for (var i in parsedStats) {
                 var playerName = i;
                 for (var j in parsedStats[playerName]) {
-                    fileName = sprintf('%s_%s_%s.txt', playerName, matchCount, j);
-                    fileContents = sprintf('Last %s %s: %s', matchCount, j, parsedStats[playerName][j]);
+                    var fileName = sprintf('%s_%s_%s.txt', playerName, matchCount, j);
+                    var fileContentsTemplate = this.appSettings[j];
+                    var fileContents = sprintf(fileContentsTemplate, {
+                        count: matchCount,
+                        value: parsedStats[playerName][j]
+                    });
                     this.writeFile(fileName, fileContents);
                 }
             }
@@ -202,7 +207,7 @@
             // Player should never be cached because we want fresh set of matches every time
             // Also if the player name is updated in settings we should update the files
             try {
-                var players = await this.battlegrounds.getPlayers({ names: [this.app_settings.player_name] });
+                var players = await this.battlegrounds.getPlayers({ names: [this.appSettings.playerName] });
             } catch(err) {
                 this.writeLog(err);
                 this.abort();
@@ -240,18 +245,18 @@
         async runStream(e) {
             e.preventDefault();
             // grab the settings everytime
-            this.app_settings = app_settings.get('app_settings');
+            this.appSettings = appSettings.get('appSettings');
 
             // let the user know they have now setup the application yet
-            if (this.app_settings === undefined) {
+            if (this.appSettings === undefined) {
                 this.writeLog('Cannot run yet. Please visit the settings page to setup the application and click run again.');
                 return
             }
 
             // setup the API instance
             if (this.battlegrounds == null) {
-                this.app_settings = app_settings.get('app_settings');
-                this.battlegrounds = new battlegrounds(this.app_settings.api_key, this.app_settings.region);
+                this.appSettings = appSettings.get('appSettings');
+                this.battlegrounds = new battlegrounds(this.appSettings.apiKey, this.appSettings.region);
             }
 
             this.writeLog('Stats streaming started.');

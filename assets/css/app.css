@@ -18,3 +18,22 @@
     padding: 2px;
     margin: 1px;
 }
+
+#settings-form {
+    overflow-y: scroll;
+    height: 300px;
+    -webkit-box-shadow: inset 0px -5px 5px 0px rgba(61,61,61,1);
+    -moz-box-shadow: inset 0px -5px 5px 0px rgba(61,61,61,1);
+    box-shadow: inset 0px -5px 5px 0px rgba(61,61,61,1);
+}
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: #E3ECF3;
+  -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
