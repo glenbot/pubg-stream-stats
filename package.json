@@ -1,6 +1,6 @@
 {
   "name": "pubg-stream-stats",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Get PUBG API data to text files for use in streaming software",
   "main": "main.js",
   "scripts": {
